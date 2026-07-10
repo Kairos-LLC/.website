@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Lint, build, and test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # actions/setup-node's `cache: npm` input hashes package-lock.json (or
+      # npm-shrinkwrap.json/yarn.lock) to build the cache key, and the step
+      # fails outright if none of those files exist. At the time this
+      # workflow was authored, package.json scaffolding (Unit 6) was landing
+      # concurrently and no lockfile existed on main yet. To avoid CI failing
+      # on setup alone before a lockfile lands, caching is only enabled when
+      # a lockfile is present; once one is committed this automatically
+      # switches to the cached path.
+      - name: Setup Node.js (with npm cache)
+        if: hashFiles('package-lock.json', 'npm-shrinkwrap.json') != ''
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup Node.js (no lockfile yet, no cache)
+        if: hashFiles('package-lock.json', 'npm-shrinkwrap.json') == ''
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # `npm ci` requires a committed package-lock.json; fall back to
+      # `npm install` until Unit 6's lockfile lands (see note above).
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      # --if-present so the pipeline doesn't fail while no "test" script
+      # exists yet in package.json.
+      - name: Test
+        run: npm test --if-present
