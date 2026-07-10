@@ -1,0 +1,63 @@
+# Supabase CLI project configuration for Kairos.
+#
+# This file configures the *local* Supabase CLI stack (`supabase start`) and
+# documents the pooling settings that should be mirrored in the linked
+# hosted project's dashboard (Project Settings -> Database -> Connection
+# pooling) once a live Supabase project is provisioned.
+#
+# NOTE: This is scaffolding only. No project has been provisioned yet and
+# no credentials are stored here. `project_id` is a placeholder.
+
+project_id = "kairos"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public"]
+max_rows = 1000
+
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 15
+
+# Connection pooler (PgBouncer) configuration.
+#
+# Kairos runs on Next.js deployed to Vercel serverless functions. Each
+# function invocation is short-lived and can open its own Postgres
+# connection; under load this exhausts Postgres' direct connection limit
+# very quickly. All app-runtime queries MUST go through this transaction-mode
+# pooler instead of connecting to Postgres directly.
+#
+# See lib/supabase/pooling.md for the full rationale and connection-string
+# conventions.
+[db.pooler]
+enabled = true
+# Transaction mode is required for serverless/edge runtimes: connections are
+# borrowed for the lifetime of a single transaction and returned to the pool
+# immediately after, rather than being held for a client session. Session
+# mode is NOT safe here because Vercel functions cannot guarantee a stable,
+# long-lived client session to pin to a backend connection.
+pool_mode = "transaction"
+# Max number of client connections PgBouncer will accept from the app tier.
+# Starting point for a small-to-medium app; see pooling.md for tuning
+# guidance based on real Vercel concurrency once the app is live.
+default_pool_size = 15
+max_client_conn = 200
+
+[studio]
+enabled = true
+port = 54323
+
+[inbucket]
+enabled = false
+
+[storage]
+enabled = false
+
+[auth]
+enabled = false
+
+[analytics]
+enabled = false
