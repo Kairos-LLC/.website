@@ -1,0 +1,74 @@
+.main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+}
+
+.header {
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  color: #666;
+  margin: 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  border: 1px solid #e2e2e2;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.day {
+  font-weight: 600;
+  margin: 0;
+}
+
+.time {
+  font-size: 0.9rem;
+  color: #555;
+  margin: 0;
+}
+
+.badge {
+  align-self: flex-start;
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+}
+
+.free {
+  background: #e6f7ed;
+  color: #1a7f4e;
+}
+
+.busy {
+  background: #fdecec;
+  color: #b3261e;
+}
+
+.tentative {
+  background: #fff6e0;
+  color: #8a6100;
+}
