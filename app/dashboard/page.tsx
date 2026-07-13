@@ -29,6 +29,7 @@ export default function DashboardPage() {
   return (
     <main className={styles.main}>
       <header className={styles.header}>
+        <p className="kicker">Preview</p>
         <h1 className={styles.title}>Your Schedule</h1>
         <p className={styles.subtitle}>
           This is a placeholder view. Sign in with your recovery key to see
