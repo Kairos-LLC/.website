@@ -1,56 +1,184 @@
 .main {
   display: flex;
-  min-height: 100vh;
-  align-items: center;
-  justify-content: center;
-  padding: 3rem 1.5rem;
+  flex-direction: column;
 }
 
+/* ---------------------------------------------------------------- hero */
+
 .hero {
-  max-width: 640px;
-  text-align: center;
+  max-width: 1080px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 7rem 1.5rem 6rem;
 }
 
 .title {
-  font-size: 3rem;
-  font-weight: 700;
-  margin: 0 0 0.5rem;
-  letter-spacing: -0.02em;
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(3.2rem, 9vw, 6.5rem);
+  line-height: 0.98;
+  letter-spacing: -0.01em;
+  margin: 1.1rem 0 1.75rem;
+  text-transform: uppercase;
 }
 
-.tagline {
-  font-size: 1.25rem;
-  color: #555;
-  margin: 0 0 1.5rem;
+.title em {
+  font-style: italic;
+  color: var(--accent);
 }
 
-.description {
-  font-size: 1rem;
-  line-height: 1.6;
-  color: #333;
-  margin: 0 0 2rem;
+.lede {
+  max-width: 34rem;
+  font-size: 1.05rem;
+  line-height: 1.65;
+  color: var(--muted);
+  margin: 0 0 2.25rem;
 }
+
+.ctaRow {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.ctaPill {
+  display: inline-block;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 0.8rem 1.6rem;
+  border-radius: 999px;
+}
+
+/* ------------------------------------------------------------ features */
 
 .features {
+  max-width: 1080px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 1.5rem 5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 3rem 2.5rem;
+  border-top: 1px solid var(--hairline);
+  padding-top: 4rem;
+}
+
+.featureTitle {
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 400;
+  font-size: 2rem;
+  line-height: 1.05;
+  text-transform: uppercase;
+  margin: 0.75rem 0 0.9rem;
+}
+
+.featureBody {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--muted);
+  margin: 0;
+}
+
+/* -------------------------------------------------------- mission band */
+
+.missionBand {
+  background: var(--accent);
+  padding: 6rem 1.5rem;
+}
+
+.missionBand > div {
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+.missionKicker {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.missionLine {
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(2.2rem, 5.5vw, 4rem);
+  line-height: 1.05;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+  margin: 1rem 0 0;
+  max-width: 60rem;
+}
+
+.missionLine em {
+  font-style: italic;
+}
+
+/* --------------------------------------------------------------- roles */
+
+.roles {
+  max-width: 1080px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 5rem 1.5rem;
+}
+
+.rolesIntro {
+  max-width: 30rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--muted);
+  margin: 0.75rem 0 2rem;
+}
+
+.roleList {
   list-style: none;
   padding: 0;
   margin: 0;
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  text-align: left;
-  font-size: 0.95rem;
-  color: #444;
+  flex-wrap: wrap;
+  gap: 0.6rem;
 }
 
-.features li {
-  padding-left: 1.25rem;
-  position: relative;
+.roleChip {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  padding: 0.55rem 1.1rem;
+  transition: border-color 0.2s ease, transform 0.2s ease;
 }
 
-.features li::before {
-  content: "\2022";
-  position: absolute;
-  left: 0;
-  color: #6d5efc;
+.roleChip:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+/* -------------------------------------------------------------- footer */
+
+.footer {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  max-width: 1080px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 3rem;
+  border-top: 1px solid var(--hairline);
+}
+
+.footerNote {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .roleChip:hover {
+    transform: none;
+  }
 }

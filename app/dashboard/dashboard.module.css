@@ -1,7 +1,7 @@
 .main {
   max-width: 900px;
   margin: 0 auto;
-  padding: 3rem 1.5rem;
+  padding: 3.5rem 1.5rem 5rem;
 }
 
 .header {
@@ -9,15 +9,17 @@
 }
 
 .title {
-  font-size: 2rem;
-  font-weight: 700;
-  margin: 0 0 0.5rem;
-  letter-spacing: -0.02em;
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 400;
+  font-size: 2.6rem;
+  line-height: 1;
+  text-transform: uppercase;
+  margin: 0.6rem 0 0.6rem;
 }
 
 .subtitle {
   font-size: 0.95rem;
-  color: #666;
+  color: var(--muted);
   margin: 0;
 }
 
@@ -28,12 +30,19 @@
 }
 
 .card {
-  border: 1px solid #e2e2e2;
-  border-radius: 8px;
+  background: var(--paper);
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
   padding: 1rem 1.25rem;
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
 }
 
 .day {
@@ -43,18 +52,19 @@
 
 .time {
   font-size: 0.9rem;
-  color: #555;
+  color: var(--muted);
   margin: 0;
 }
 
 .badge {
   align-self: flex-start;
   margin-top: 0.5rem;
-  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
-  padding: 0.2rem 0.55rem;
+  letter-spacing: 0.08em;
+  padding: 0.2rem 0.6rem;
   border-radius: 999px;
 }
 
@@ -71,4 +81,27 @@
 .tentative {
   background: #fff6e0;
   color: #8a6100;
+}
+
+@media (prefers-color-scheme: dark) {
+  .free {
+    background: rgba(26, 127, 78, 0.2);
+    color: #6fd9a3;
+  }
+
+  .busy {
+    background: rgba(179, 38, 30, 0.2);
+    color: #ff9d95;
+  }
+
+  .tentative {
+    background: rgba(138, 97, 0, 0.2);
+    color: #ffd479;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card:hover {
+    transform: none;
+  }
 }
