@@ -1,4 +1,7 @@
+"use client";
+
 import styles from "./dashboard.module.css";
+import { useScrollReveal } from "../../lib/ui/useScrollReveal";
 
 // NOTE: This is a UI shell only. All data below is hardcoded placeholder
 // content to prove routing/rendering works. It is intentionally NOT wired
@@ -25,26 +28,46 @@ const STATUS_LABEL: Record<PlaceholderSlot["status"], string> = {
   tentative: "Tentative",
 };
 
+function ScheduleCard({
+  slot,
+  delayMs,
+}: {
+  slot: PlaceholderSlot;
+  delayMs: number;
+}) {
+  const cardRef = useScrollReveal<HTMLElement>();
+
+  return (
+    <article
+      ref={cardRef}
+      className={`${styles.card} glass reveal`}
+      style={{ transitionDelay: `${delayMs}ms` }}
+    >
+      <p className={styles.day}>{slot.day}</p>
+      <p className={styles.time}>{slot.time}</p>
+      <span className={`${styles.badge} ${styles[slot.status]}`}>
+        {STATUS_LABEL[slot.status]}
+      </span>
+    </article>
+  );
+}
+
 export default function DashboardPage() {
+  const headerRef = useScrollReveal<HTMLElement>();
+
   return (
     <main className={styles.main}>
-      <header className={styles.header}>
+      <header ref={headerRef} className={`${styles.header} glass reveal`}>
         <h1 className={styles.title}>Your Schedule</h1>
         <p className={styles.subtitle}>
-          This is a placeholder view. Sign in with your recovery key to see
-          your real availability.
+          Placeholder view — sign in with your recovery key to see your real
+          availability.
         </p>
       </header>
 
       <section aria-label="Placeholder schedule" className={styles.grid}>
-        {MOCK_SCHEDULE.map((slot) => (
-          <article key={slot.id} className={styles.card}>
-            <p className={styles.day}>{slot.day}</p>
-            <p className={styles.time}>{slot.time}</p>
-            <span className={`${styles.badge} ${styles[slot.status]}`}>
-              {STATUS_LABEL[slot.status]}
-            </span>
-          </article>
+        {MOCK_SCHEDULE.map((slot, index) => (
+          <ScheduleCard key={slot.id} slot={slot} delayMs={index * 60} />
         ))}
       </section>
     </main>

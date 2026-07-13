@@ -14,7 +14,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <div className="gradient-mesh" aria-hidden="true">
+          <span />
+        </div>
+        {children}
+      </body>
     </html>
   );
 }
