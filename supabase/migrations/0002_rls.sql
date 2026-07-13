@@ -20,9 +20,16 @@
 -- If 0001_init.sql has not landed yet, applying this migration will fail
 -- (ALTER TABLE / CREATE POLICY against nonexistent tables). Apply 0001
 -- first. Column names referenced below (e.g. `user_id`, `schedule_pattern_id`,
--- `shared_schedule_id`, `code`, `used_at`) are the assumed contract between
+-- `shared_schedule_id`, `code`, `is_used`) are the assumed contract between
 -- the two units; if Unit 1 lands with different names, this file will need
 -- a follow-up patch to match.
+--
+-- NOTE: an earlier draft of this migration assumed a `used_at timestamptz`
+-- column for single-use enforcement instead of the `is_used boolean` column
+-- 0001_init.sql actually defines (and that lib/db/queries.ts, Unit 7, already
+-- reads/writes). Reconciled to `is_used` throughout this file — see
+-- ARCHITECTURE.md section 1.2 for why this drifted and why `is_used` is the
+-- side that's correct.
 --
 -- =============================================================================
 -- IDENTITY STRATEGY (read this before touching any policy below)
@@ -106,18 +113,20 @@
 --    "the first read/redemption consumes this row and all subsequent ones
 --    fail" as a pure SELECT policy without also blocking the legitimate
 --    redeemer's own read. We therefore split the enforcement:
---      - DB-LAYER (this migration): the `used_at timestamptz` column is
---        assumed to come from 0001; this migration additionally adds a
---        unique partial index (`access_codes_code_unused_uidx`, below) so
---        two concurrent redemption attempts can't both succeed by racing
---        an UPDATE against a duplicate `code` value, plus an UPDATE policy
---        that only allows setting `used_at` once (see policy
---        `access_codes_mark_used` below) — together these are the "reject
---        if already used" transactional backstop at the DB layer.
+--      - DB-LAYER (this migration): the `is_used boolean` column comes from
+--        0001; `code` is already `unique` there too (holds for the row's
+--        entire lifetime, used or not), which is already sufficient to stop
+--        two concurrent redemptions of the same code value from racing —
+--        no additional index is needed here (see the note at
+--        `access_codes_code_unused_uidx`'s old location, removed below).
+--        Single-use itself is enforced by an UPDATE policy that only allows
+--        setting `is_used` from false to true, never back (see policy
+--        `access_codes_mark_used` below) — this is the "reject if already
+--        used" transactional backstop at the DB layer.
 --      - APP-LAYER (edge function, NOT in this repo/migration): the
 --        redemption edge function must run the SELECT-then-UPDATE as a
---        single transaction (`UPDATE access_codes SET used_at = now()
---        WHERE code = $1 AND used_at IS NULL RETURNING *`) using the
+--        single transaction (`UPDATE access_codes SET is_used = true
+--        WHERE code = $1 AND is_used = false RETURNING *`) using the
 --        service role, and treat zero rows returned as "invalid or already
 --        used." This is called out explicitly because a naive
 --        read-then-write from application code (two round trips) would be
@@ -424,25 +433,22 @@ CREATE POLICY shared_schedules_delete_owner
 -- forcing of codes through the normal API surface.
 --
 -- SINGLE-USE ENFORCEMENT (see design note 6 above for full reasoning):
---   - The authoritative check is an atomic `UPDATE ... WHERE used_at IS
---     NULL ... RETURNING` performed by the service-role redemption edge
+--   - The authoritative check is an atomic `UPDATE ... WHERE is_used =
+--     false ... RETURNING` performed by the service-role redemption edge
 --     function — that is application code, not part of this migration.
 --   - As defense in depth, the UPDATE policy below still prevents an
 --     `authenticated` caller (e.g. the owner, who CAN see their own codes)
---     from flipping `used_at` back to NULL to "reset" a code, and prevents
---     setting `used_at` on a code that isn't theirs.
+--     from flipping `is_used` back to false to "reset" a code, and prevents
+--     setting `is_used` on a code that isn't theirs.
+--
+-- No additional unique index is needed for the redemption race itself:
+-- 0001_init.sql's `code text not null unique` already guarantees at most one
+-- row can hold any given code value, for that row's entire lifetime (used or
+-- not) — strictly stronger than a partial "unused only" index would be, so
+-- nothing further is added here.
 
 ALTER TABLE access_codes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE access_codes FORCE ROW LEVEL SECURITY;
-
--- Defense-in-depth for single-use: even though `code` is presumed unique
--- overall (Unit 1's concern), this partial unique index specifically
--- guards the redemption window by ensuring at most one *unused* row can
--- exist per code value at a time, so a duplicate-code edge case can't be
--- exploited to redeem "the same" code twice concurrently.
-CREATE UNIQUE INDEX IF NOT EXISTS access_codes_code_unused_uidx
-  ON access_codes (code)
-  WHERE used_at IS NULL;
 
 CREATE POLICY access_codes_select_owner
   ON access_codes
@@ -478,7 +484,7 @@ CREATE POLICY access_codes_delete_owner_unused
   FOR DELETE
   TO authenticated
   USING (
-    used_at IS NULL
+    is_used = false
     AND EXISTS (
       SELECT 1
       FROM shared_schedules ss
@@ -488,7 +494,7 @@ CREATE POLICY access_codes_delete_owner_unused
   );
 
 -- Defense-in-depth backstop described above: allows marking a code used
--- exactly once, and only forward (NULL -> timestamp), never backward. The
+-- exactly once, and only forward (false -> true), never backward. The
 -- primary enforcement remains the service-role atomic UPDATE in the
 -- redemption edge function.
 CREATE POLICY access_codes_mark_used
@@ -496,7 +502,7 @@ CREATE POLICY access_codes_mark_used
   FOR UPDATE
   TO authenticated
   USING (
-    used_at IS NULL
+    is_used = false
     AND EXISTS (
       SELECT 1
       FROM shared_schedules ss
@@ -505,7 +511,7 @@ CREATE POLICY access_codes_mark_used
     )
   )
   WITH CHECK (
-    used_at IS NOT NULL
+    is_used = true
     AND EXISTS (
       SELECT 1
       FROM shared_schedules ss
@@ -515,13 +521,13 @@ CREATE POLICY access_codes_mark_used
   );
 
 -- No general UPDATE-any-column policy is granted beyond the above: the
--- WITH CHECK on access_codes_mark_used only constrains used_at's
+-- WITH CHECK on access_codes_mark_used only constrains is_used's
 -- transition, but note that Postgres RLS UPDATE policies do not restrict
 -- *which* columns change — only whether the resulting row satisfies WITH
 -- CHECK and the pre-image satisfied USING. If tighter column-level control
 -- is later required (e.g. preventing the owner from also rewriting `code`
 -- on the same UPDATE), add a `REVOKE UPDATE (code) ON access_codes FROM
--- authenticated; GRANT UPDATE (used_at) ON access_codes TO authenticated;`
+-- authenticated; GRANT UPDATE (is_used) ON access_codes TO authenticated;`
 -- pair, since column privileges compose with RLS policies.
 
 -- =============================================================================
