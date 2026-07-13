@@ -1,14 +1,17 @@
 .main {
   display: flex;
-  min-height: 100vh;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 3rem 1.5rem;
+  gap: 3rem;
+  min-height: 100vh;
+  padding: 4rem 1.5rem 6rem;
 }
 
 .hero {
   max-width: 640px;
+  width: 100%;
   text-align: center;
+  padding: 3rem 2.5rem;
 }
 
 .title {
@@ -16,18 +19,22 @@
   font-weight: 700;
   margin: 0 0 0.5rem;
   letter-spacing: -0.02em;
+  background: linear-gradient(135deg, var(--accent), #5ec8fc);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .tagline {
   font-size: 1.25rem;
-  color: #555;
+  color: var(--text-secondary);
   margin: 0 0 1.5rem;
 }
 
 .description {
   font-size: 1rem;
   line-height: 1.6;
-  color: #333;
+  color: var(--text-secondary);
   margin: 0 0 2rem;
 }
 
@@ -40,7 +47,7 @@
   gap: 0.5rem;
   text-align: left;
   font-size: 0.95rem;
-  color: #444;
+  color: var(--text-secondary);
 }
 
 .features li {
@@ -52,5 +59,54 @@
   content: "\2022";
   position: absolute;
   left: 0;
-  color: #6d5efc;
+  color: var(--accent);
+}
+
+.programs {
+  max-width: 640px;
+  width: 100%;
+  padding: 2.5rem 2.5rem 2.75rem;
+}
+
+.programsTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.01em;
+}
+
+.programsIntro {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin: 0 0 1.5rem;
+}
+
+.roles {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.75rem;
+}
+
+.role {
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: center;
+  color: var(--text-primary);
+  border-radius: 14px;
+  transition: transform 0.25s ease;
+}
+
+.role:hover {
+  transform: translateY(-3px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .role:hover {
+    transform: none;
+  }
 }

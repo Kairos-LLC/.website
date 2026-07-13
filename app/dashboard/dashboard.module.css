@@ -1,10 +1,11 @@
 .main {
   max-width: 900px;
   margin: 0 auto;
-  padding: 3rem 1.5rem;
+  padding: 4rem 1.5rem 6rem;
 }
 
 .header {
+  padding: 2rem 2.25rem;
   margin-bottom: 2rem;
 }
 
@@ -17,33 +18,37 @@
 
 .subtitle {
   font-size: 0.95rem;
-  color: #666;
+  color: var(--text-tertiary);
   margin: 0;
 }
 
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 1rem;
+  gap: 1.25rem;
 }
 
 .card {
-  border: 1px solid #e2e2e2;
-  border-radius: 8px;
-  padding: 1rem 1.25rem;
+  padding: 1.25rem 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
+  transition: transform 0.25s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
 }
 
 .day {
   font-weight: 600;
   margin: 0;
+  color: var(--text-primary);
 }
 
 .time {
   font-size: 0.9rem;
-  color: #555;
+  color: var(--text-secondary);
   margin: 0;
 }
 
@@ -59,16 +64,36 @@
 }
 
 .free {
-  background: #e6f7ed;
+  background: rgba(26, 127, 78, 0.15);
   color: #1a7f4e;
 }
 
 .busy {
-  background: #fdecec;
+  background: rgba(179, 38, 30, 0.15);
   color: #b3261e;
 }
 
 .tentative {
-  background: #fff6e0;
+  background: rgba(138, 97, 0, 0.15);
   color: #8a6100;
+}
+
+@media (prefers-color-scheme: dark) {
+  .free {
+    color: #6fd9a3;
+  }
+
+  .busy {
+    color: #ff9d95;
+  }
+
+  .tentative {
+    color: #ffd479;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card:hover {
+    transform: none;
+  }
 }
