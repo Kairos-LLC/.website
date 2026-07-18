@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kairos — Know when they're free</title>
+<meta name="description" content="Kairos is a modern app for seeing when friends and family are available, 24/7." />
+<link rel="icon" href="icon.png" />
+<style>
+  :root {
+    --ink: #16161f;
+    --paper: #f4f1ea;
+    --paper-dim: #e9e4d8;
+    --line: rgba(22,22,31,0.12);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 28px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    font-size: 18px;
+  }
+  .brand img {
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+  }
+  nav a {
+    color: var(--ink);
+    text-decoration: none;
+    opacity: 0.7;
+    font-size: 14px;
+    margin-left: 24px;
+  }
+  nav a:hover { opacity: 1; }
+  .hero {
+    text-align: center;
+    padding: 96px 0 64px;
+  }
+  .hero img {
+    width: 112px;
+    height: 112px;
+    border-radius: 26px;
+    box-shadow: 0 20px 60px rgba(22,22,31,0.18);
+    margin-bottom: 36px;
+  }
+  h1 {
+    font-size: clamp(32px, 6vw, 52px);
+    line-height: 1.1;
+    margin: 0 0 18px;
+    letter-spacing: -0.01em;
+  }
+  .sub {
+    font-size: 19px;
+    line-height: 1.55;
+    max-width: 540px;
+    margin: 0 auto 36px;
+    opacity: 0.72;
+  }
+  .cta {
+    display: inline-flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .btn {
+    display: inline-block;
+    padding: 13px 26px;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: opacity 0.15s ease;
+  }
+  .btn-primary {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .btn-secondary {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--line);
+  }
+  .btn:hover { opacity: 0.82; }
+  .features {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    overflow: hidden;
+    margin: 40px 0 100px;
+  }
+  .feature {
+    background: var(--paper);
+    padding: 32px 26px;
+  }
+  .feature h3 {
+    font-size: 16px;
+    margin: 0 0 8px;
+  }
+  .feature p {
+    font-size: 14px;
+    line-height: 1.5;
+    opacity: 0.65;
+    margin: 0;
+  }
+  footer {
+    border-top: 1px solid var(--line);
+    padding: 28px 0 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    opacity: 0.55;
+  }
+  footer a { color: inherit; }
+  @media (max-width: 640px) {
+    .features { grid-template-columns: 1fr; }
+    header nav a { margin-left: 16px; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <img src="icon.png" alt="Kairos" />
+        <span>KAIROS</span>
+      </div>
+      <nav>
+        <a href="#features">Features</a>
+        <a href="mailto:hello@kairosapp.dev">Contact</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <img src="icon.png" alt="Kairos logo" />
+      <h1>Know when they're free.</h1>
+      <p class="sub">Kairos is a modern way to share your schedule with the people who matter — see who's around, 24/7, without the back-and-forth.</p>
+      <div class="cta">
+        <a class="btn btn-primary" href="#features">See how it works</a>
+        <a class="btn btn-secondary" href="mailto:hello@kairosapp.dev">Get in touch</a>
+      </div>
+    </section>
+
+    <section class="features" id="features">
+      <div class="feature">
+        <h3>Share your schedule</h3>
+        <p>Import a shared schedule with a one-time code and see availability at a glance.</p>
+      </div>
+      <div class="feature">
+        <h3>Private by design</h3>
+        <p>Your schedule, your device. Recovery keys let you back up and restore without an account.</p>
+      </div>
+      <div class="feature">
+        <h3>Built for real life</h3>
+        <p>Custom weekly patterns, shift cycles, and dashboard badges keep everyone in sync.</p>
+      </div>
+    </section>
+
+    <footer>
+      <span>&copy; 2026 Kairos LLC</span>
+      <span><a href="mailto:hello@kairosapp.dev">hello@kairosapp.dev</a></span>
+    </footer>
+  </div>
+</body>
+</html>
