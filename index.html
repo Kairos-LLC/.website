@@ -1,0 +1,830 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kairos — Know when they're free</title>
+<meta name="description" content="Kairos is a modern app for seeing when friends and family are available, 24/7 — without the back-and-forth." />
+<meta property="og:title" content="Kairos — Know when they're free" />
+<meta property="og:description" content="A modern way to share your schedule with the people who matter. See who's around, 24/7." />
+<meta property="og:type" content="website" />
+<meta name="theme-color" content="#f4f1ea" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#101018" media="(prefers-color-scheme: dark)" />
+<link rel="icon" href="icon.svg" type="image/svg+xml" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ink: #16161f;
+    --ink-soft: rgba(22, 22, 31, 0.68);
+    --ink-faint: rgba(22, 22, 31, 0.45);
+    --paper: #f4f1ea;
+    --paper-raised: #faf8f3;
+    --paper-dim: #ece7db;
+    --line: rgba(22, 22, 31, 0.12);
+    --line-soft: rgba(22, 22, 31, 0.07);
+    --accent: #b07d1e;
+    --accent-bright: #e8b84b;
+    --free: #3d8b5f;
+    --busy: #c0563f;
+    --shadow-lg: 0 24px 70px rgba(22, 22, 31, 0.16);
+    --shadow-sm: 0 2px 12px rgba(22, 22, 31, 0.07);
+    --serif: "Fraunces", Georgia, "Times New Roman", serif;
+    --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ink: #ecebe4;
+      --ink-soft: rgba(236, 235, 228, 0.68);
+      --ink-faint: rgba(236, 235, 228, 0.45);
+      --paper: #101018;
+      --paper-raised: #181822;
+      --paper-dim: #0b0b12;
+      --line: rgba(236, 235, 228, 0.14);
+      --line-soft: rgba(236, 235, 228, 0.07);
+      --accent: #e8b84b;
+      --accent-bright: #e8b84b;
+      --free: #5cb886;
+      --busy: #d97a63;
+      --shadow-lg: 0 24px 70px rgba(0, 0, 0, 0.5);
+      --shadow-sm: 0 2px 12px rgba(0, 0, 0, 0.3);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  ::selection { background: var(--accent-bright); color: #16161f; }
+
+  .wrap {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* ---------- Header ---------- */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: color-mix(in srgb, var(--paper) 82%, transparent);
+    -webkit-backdrop-filter: saturate(1.4) blur(14px);
+    backdrop-filter: saturate(1.4) blur(14px);
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 0;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    font-size: 15px;
+    text-decoration: none;
+    color: var(--ink);
+  }
+  .brand img { width: 30px; height: 30px; border-radius: 8px; display: block; }
+  nav { display: flex; align-items: center; gap: 6px; }
+  nav a {
+    color: var(--ink);
+    text-decoration: none;
+    opacity: 0.68;
+    font-size: 14px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    transition: opacity 0.15s ease, background 0.15s ease;
+  }
+  nav a:hover { opacity: 1; background: var(--line-soft); }
+  nav a.nav-cta {
+    opacity: 1;
+    background: var(--ink);
+    color: var(--paper);
+    font-weight: 600;
+    padding: 8px 18px;
+    margin-left: 8px;
+  }
+  nav a.nav-cta:hover { background: var(--ink); opacity: 0.85; }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    position: relative;
+    padding: 92px 0 40px;
+    overflow: hidden;
+  }
+  .hero-glow {
+    position: absolute;
+    top: -220px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 900px;
+    height: 560px;
+    background: radial-gradient(closest-side, color-mix(in srgb, var(--accent-bright) 16%, transparent), transparent 70%);
+    pointer-events: none;
+  }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    gap: 64px;
+    align-items: center;
+    position: relative;
+  }
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 22px;
+  }
+  .eyebrow::before {
+    content: "";
+    width: 22px;
+    height: 1px;
+    background: var(--accent);
+  }
+  h1 {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: clamp(40px, 6.5vw, 68px);
+    line-height: 1.04;
+    letter-spacing: -0.015em;
+    margin: 0 0 24px;
+  }
+  h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+  .sub {
+    font-size: 18px;
+    line-height: 1.65;
+    max-width: 480px;
+    margin: 0 0 36px;
+    color: var(--ink-soft);
+  }
+  .cta { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+  .btn {
+    display: inline-block;
+    padding: 14px 28px;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
+  }
+  .btn-primary {
+    background: var(--ink);
+    color: var(--paper);
+    box-shadow: var(--shadow-sm);
+  }
+  .btn-secondary {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--line);
+  }
+  .btn:hover { transform: translateY(-1px); opacity: 0.88; }
+  .btn:active { transform: translateY(0); }
+  .hero-note {
+    margin-top: 22px;
+    font-size: 13px;
+    color: var(--ink-faint);
+  }
+
+  /* ---------- App mockup ---------- */
+  .mockup {
+    position: relative;
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    padding: 24px;
+    box-shadow: var(--shadow-lg);
+    transform: rotate(1.2deg);
+  }
+  .mockup-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 18px;
+  }
+  .mockup-title {
+    font-family: var(--serif);
+    font-size: 19px;
+    font-weight: 600;
+  }
+  .mockup-clock {
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-faint);
+  }
+  .person {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 13px 4px;
+    border-top: 1px solid var(--line-soft);
+  }
+  .person:first-of-type { border-top: 0; }
+  .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-weight: 600;
+    font-size: 15px;
+    color: #16161f;
+    flex-shrink: 0;
+    position: relative;
+  }
+  .avatar::after {
+    content: "";
+    position: absolute;
+    right: -1px;
+    bottom: -1px;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    border: 2.5px solid var(--paper-raised);
+    background: var(--busy);
+  }
+  .person.is-free .avatar::after { background: var(--free); }
+  .a1 { background: #e9c46a; }
+  .a2 { background: #a8c5b4; }
+  .a3 { background: #d9a5a0; }
+  .a4 { background: #b3bce0; }
+  .person-info { flex: 1; min-width: 0; }
+  .person-name { font-weight: 600; font-size: 14.5px; line-height: 1.3; }
+  .person-status { font-size: 12.5px; color: var(--ink-faint); }
+  .timeline {
+    display: flex;
+    gap: 3px;
+    width: 104px;
+    flex-shrink: 0;
+  }
+  .timeline i {
+    height: 22px;
+    flex: 1;
+    border-radius: 3px;
+    background: var(--line-soft);
+  }
+  .timeline i.on { background: color-mix(in srgb, var(--free) 55%, transparent); }
+  .timeline i.now {
+    background: var(--free);
+    outline: 2px solid color-mix(in srgb, var(--free) 30%, transparent);
+  }
+  .person:not(.is-free) .timeline i.now {
+    background: var(--busy);
+    outline-color: color-mix(in srgb, var(--busy) 30%, transparent);
+  }
+  .mockup-chip {
+    position: absolute;
+    top: -18px;
+    right: -14px;
+    background: var(--ink);
+    color: var(--paper);
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 9px 16px;
+    border-radius: 999px;
+    box-shadow: var(--shadow-sm);
+    transform: rotate(-2deg);
+  }
+  .mockup-chip b { color: var(--accent-bright); font-weight: 600; }
+
+  /* ---------- Sections ---------- */
+  section { padding: 88px 0; }
+  .section-head { max-width: 560px; margin-bottom: 56px; }
+  .section-head.center { margin-left: auto; margin-right: auto; text-align: center; }
+  h2 {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: clamp(28px, 4vw, 40px);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin: 0 0 16px;
+  }
+  .section-head p { color: var(--ink-soft); margin: 0; font-size: 16.5px; }
+
+  /* Features */
+  .features {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+  .feature {
+    background: var(--paper-raised);
+    padding: 36px 30px;
+    transition: background 0.2s ease;
+  }
+  .feature:hover { background: var(--paper); }
+  .feature-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    background: color-mix(in srgb, var(--accent-bright) 16%, transparent);
+    color: var(--accent);
+    margin-bottom: 20px;
+  }
+  .feature-icon svg { width: 21px; height: 21px; }
+  .feature h3 {
+    font-size: 17px;
+    font-weight: 600;
+    margin: 0 0 10px;
+    letter-spacing: -0.01em;
+  }
+  .feature p {
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    margin: 0;
+  }
+
+  /* How it works */
+  .how { background: var(--paper-dim); }
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+    counter-reset: step;
+  }
+  .step { counter-increment: step; position: relative; }
+  .step::before {
+    content: "0" counter(step);
+    font-family: var(--serif);
+    font-size: 52px;
+    font-weight: 500;
+    line-height: 1;
+    color: transparent;
+    -webkit-text-stroke: 1px var(--ink-faint);
+    display: block;
+    margin-bottom: 18px;
+  }
+  .step h3 { font-size: 17px; font-weight: 600; margin: 0 0 10px; }
+  .step p { font-size: 14.5px; color: var(--ink-soft); margin: 0; line-height: 1.65; }
+
+  /* Privacy */
+  .privacy-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 64px;
+    align-items: center;
+  }
+  .privacy-points { list-style: none; margin: 28px 0 0; padding: 0; }
+  .privacy-points li {
+    display: flex;
+    gap: 14px;
+    padding: 14px 0;
+    border-top: 1px solid var(--line-soft);
+    font-size: 15px;
+    color: var(--ink-soft);
+  }
+  .privacy-points li strong { color: var(--ink); font-weight: 600; }
+  .check {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--free) 18%, transparent);
+    color: var(--free);
+    display: grid;
+    place-items: center;
+    margin-top: 2px;
+  }
+  .check svg { width: 12px; height: 12px; }
+  .key-card {
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 20px;
+    padding: 36px 32px;
+    box-shadow: var(--shadow-lg);
+    transform: rotate(-1deg);
+  }
+  @media (prefers-color-scheme: dark) {
+    .key-card { background: var(--paper-raised); border: 1px solid var(--line); color: var(--ink); }
+  }
+  .key-card-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    opacity: 0.55;
+    margin-bottom: 18px;
+  }
+  .key-words {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 24px;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 14px;
+  }
+  .key-words span { display: flex; gap: 10px; }
+  .key-words b { opacity: 0.4; font-weight: 400; font-variant-numeric: tabular-nums; }
+  .key-card-note {
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(255,255,255,0.14);
+    font-size: 12.5px;
+    opacity: 0.6;
+  }
+  @media (prefers-color-scheme: dark) {
+    .key-card-note { border-top-color: var(--line); }
+  }
+
+  /* FAQ */
+  .faq { max-width: 720px; margin: 0 auto; }
+  details {
+    border-top: 1px solid var(--line);
+  }
+  details:last-of-type { border-bottom: 1px solid var(--line); }
+  summary {
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding: 22px 4px;
+    font-weight: 600;
+    font-size: 16px;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::after {
+    content: "+";
+    font-family: var(--serif);
+    font-size: 24px;
+    font-weight: 400;
+    color: var(--ink-faint);
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+  }
+  details[open] summary::after { transform: rotate(45deg); }
+  details p {
+    margin: 0;
+    padding: 0 4px 24px;
+    color: var(--ink-soft);
+    font-size: 15px;
+    max-width: 620px;
+  }
+
+  /* Final CTA */
+  .closer { text-align: center; padding: 110px 0 120px; }
+  .closer h2 { font-size: clamp(32px, 5vw, 52px); margin-bottom: 20px; }
+  .closer p { color: var(--ink-soft); max-width: 460px; margin: 0 auto 36px; }
+
+  /* Footer */
+  footer {
+    border-top: 1px solid var(--line);
+    padding: 36px 0 52px;
+    font-size: 13.5px;
+    color: var(--ink-faint);
+  }
+  .footer-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .footer-brand { display: flex; align-items: center; gap: 10px; color: var(--ink-soft); font-weight: 600; letter-spacing: 0.1em; font-size: 13px; }
+  .footer-brand img { width: 22px; height: 22px; border-radius: 6px; }
+  footer a { color: inherit; text-decoration: none; }
+  footer a:hover { color: var(--ink); }
+  .footer-links { display: flex; gap: 22px; }
+
+  /* Reveal animations */
+  .reveal {
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .reveal.visible { opacity: 1; transform: none; }
+  .reveal.d1 { transition-delay: 0.08s; }
+  .reveal.d2 { transition-delay: 0.16s; }
+  .reveal.d3 { transition-delay: 0.24s; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .reveal { opacity: 1; transform: none; transition: none; }
+    .btn:hover { transform: none; }
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 900px) {
+    .hero-grid { grid-template-columns: 1fr; gap: 56px; }
+    .hero { padding-top: 64px; }
+    .mockup { transform: none; max-width: 460px; }
+    .privacy-grid { grid-template-columns: 1fr; gap: 48px; }
+    .key-card { transform: none; }
+    .features { grid-template-columns: 1fr 1fr; }
+    .feature:last-child { grid-column: 1 / -1; }
+    .steps { grid-template-columns: 1fr; gap: 36px; }
+  }
+  @media (max-width: 600px) {
+    section { padding: 64px 0; }
+    .features { grid-template-columns: 1fr; }
+    .feature:last-child { grid-column: auto; }
+    nav a:not(.nav-cta) { display: none; }
+    .mockup-chip { right: 4px; }
+  }
+</style>
+</head>
+<body>
+
+  <header>
+    <div class="wrap header-inner">
+      <a class="brand" href="#top" aria-label="Kairos home">
+        <img src="icon.svg" alt="" />
+        <span>KAIROS</span>
+      </a>
+      <nav aria-label="Main">
+        <a href="#features">Features</a>
+        <a href="#how">How it works</a>
+        <a href="#privacy">Privacy</a>
+        <a href="#faq">FAQ</a>
+        <a class="nav-cta" href="mailto:hello@kairosapp.dev">Get in touch</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-glow" aria-hidden="true"></div>
+      <div class="wrap hero-grid">
+        <div>
+          <p class="eyebrow reveal">Availability, at a glance</p>
+          <h1 class="reveal d1">Know when<br />they're <em>free.</em></h1>
+          <p class="sub reveal d2">Kairos is a modern way to share your schedule with the people who matter — see who's around, 24/7, without the back-and-forth.</p>
+          <div class="cta reveal d3">
+            <a class="btn btn-primary" href="#how">See how it works</a>
+            <a class="btn btn-secondary" href="mailto:hello@kairosapp.dev">Get in touch</a>
+          </div>
+          <p class="hero-note reveal d3">No account required &middot; Your schedule stays on your device</p>
+        </div>
+
+        <div class="reveal d2">
+          <div class="mockup" role="img" aria-label="Preview of the Kairos dashboard showing which friends are currently free">
+            <div class="mockup-chip">3 people <b>free right now</b></div>
+            <div class="mockup-head">
+              <span class="mockup-title">Today</span>
+              <span class="mockup-clock" id="clock">6:24 PM</span>
+            </div>
+            <div class="person is-free">
+              <div class="avatar a1">M</div>
+              <div class="person-info">
+                <div class="person-name">Maya</div>
+                <div class="person-status">Free until 9:00 PM</div>
+              </div>
+              <div class="timeline" aria-hidden="true">
+                <i></i><i></i><i class="on"></i><i class="now"></i><i class="on"></i><i class="on"></i><i></i><i></i>
+              </div>
+            </div>
+            <div class="person">
+              <div class="avatar a2">J</div>
+              <div class="person-info">
+                <div class="person-name">Jordan</div>
+                <div class="person-status">On shift &middot; free at 11:00 PM</div>
+              </div>
+              <div class="timeline" aria-hidden="true">
+                <i class="on"></i><i></i><i></i><i class="now"></i><i></i><i></i><i class="on"></i><i class="on"></i>
+              </div>
+            </div>
+            <div class="person is-free">
+              <div class="avatar a3">D</div>
+              <div class="person-info">
+                <div class="person-name">Dad</div>
+                <div class="person-status">Free all evening</div>
+              </div>
+              <div class="timeline" aria-hidden="true">
+                <i></i><i class="on"></i><i class="on"></i><i class="now"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i>
+              </div>
+            </div>
+            <div class="person is-free">
+              <div class="avatar a4">S</div>
+              <div class="person-info">
+                <div class="person-name">Sam</div>
+                <div class="person-status">Free until 8:30 PM</div>
+              </div>
+              <div class="timeline" aria-hidden="true">
+                <i></i><i></i><i></i><i class="now"></i><i class="on"></i><i></i><i></i><i></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section id="features">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <p class="eyebrow">Why Kairos</p>
+          <h2>Everything you need to stay in sync. Nothing you don't.</h2>
+          <p>Kairos was built for one thing: knowing when the people you care about are actually reachable.</p>
+        </div>
+        <div class="features">
+          <div class="feature reveal">
+            <div class="feature-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M12 3v13"/><path d="m7 8 5-5 5 5"/></svg>
+            </div>
+            <h3>Share your schedule</h3>
+            <p>Import a shared schedule with a one-time code and see availability at a glance. No sign-ups, no invites lost in email.</p>
+          </div>
+          <div class="feature reveal d1">
+            <div class="feature-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <h3>Private by design</h3>
+            <p>Your schedule, your device. Recovery keys let you back up and restore without an account — nothing lives on someone else's server.</p>
+          </div>
+          <div class="feature reveal d2">
+            <div class="feature-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+            </div>
+            <h3>Built for real life</h3>
+            <p>Custom weekly patterns, rotating shift cycles, and dashboard badges keep everyone in sync — even when no two weeks look the same.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How it works -->
+    <section class="how" id="how">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <p class="eyebrow">How it works</p>
+          <h2>From "are you around?" to already knowing.</h2>
+        </div>
+        <div class="steps">
+          <div class="step reveal">
+            <h3>Set your pattern</h3>
+            <p>Describe your week once — work hours, shift rotations, quiet time. Kairos handles the repetition, including cycles that don't fit a normal week.</p>
+          </div>
+          <div class="step reveal d1">
+            <h3>Share a code</h3>
+            <p>Generate a one-time code and hand it to a friend or family member. They import your schedule in seconds — no accounts, no friend requests.</p>
+          </div>
+          <div class="step reveal d2">
+            <h3>Glance, don't ask</h3>
+            <p>Your dashboard shows who's free right now and who's free soon, 24/7. Badges surface changes so you never plan around stale information.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Privacy -->
+    <section id="privacy">
+      <div class="wrap privacy-grid">
+        <div class="reveal">
+          <p class="eyebrow">Privacy</p>
+          <h2>Your time is personal. Kairos treats it that way.</h2>
+          <ul class="privacy-points">
+            <li>
+              <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4 10-10"/></svg></span>
+              <span><strong>On-device first.</strong> Your schedule lives on your phone, not in a cloud profile built around you.</span>
+            </li>
+            <li>
+              <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4 10-10"/></svg></span>
+              <span><strong>No account required.</strong> A recovery key — not an email and password — is how you back up and restore.</span>
+            </li>
+            <li>
+              <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4 10-10"/></svg></span>
+              <span><strong>You choose who sees what.</strong> Sharing happens through one-time codes you generate and hand out yourself.</span>
+            </li>
+          </ul>
+        </div>
+        <div class="reveal d1">
+          <div class="key-card" role="img" aria-label="Example recovery key made of twelve ordinary words">
+            <div class="key-card-label">Recovery key</div>
+            <div class="key-words" aria-hidden="true">
+              <span><b>01</b> harbor</span><span><b>07</b> velvet</span>
+              <span><b>02</b> maple</span><span><b>08</b> orbit</span>
+              <span><b>03</b> lantern</span><span><b>09</b> cedar</span>
+              <span><b>04</b> quiet</span><span><b>10</b> summit</span>
+              <span><b>05</b> ember</span><span><b>11</b> willow</span>
+              <span><b>06</b> tide</span><span><b>12</b> north</span>
+            </div>
+            <div class="key-card-note">Twelve ordinary words. That's your whole backup — write it down, keep it safe, and restore anywhere.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq">
+      <div class="wrap">
+        <div class="section-head center reveal">
+          <p class="eyebrow" style="justify-content:center">FAQ</p>
+          <h2>Questions, answered.</h2>
+        </div>
+        <div class="faq reveal">
+          <details>
+            <summary>Do my friends need the app to see my schedule?</summary>
+            <p>Yes — sharing works between Kairos apps. You generate a one-time code, they enter it in their app, and your availability appears on their dashboard from then on.</p>
+          </details>
+          <details>
+            <summary>Does Kairos track my location or read my calendar?</summary>
+            <p>No. Kairos only knows the availability pattern you describe to it. There's no location tracking, no calendar scraping, and no analytics profile built from your habits.</p>
+          </details>
+          <details>
+            <summary>What happens if I lose my phone?</summary>
+            <p>Restore from your recovery key — twelve ordinary words you wrote down when you set up backups. Enter them on a new device and your schedule and shares come back.</p>
+          </details>
+          <details>
+            <summary>Can it handle rotating shifts, not just 9-to-5?</summary>
+            <p>Yes. Kairos supports custom weekly patterns and shift cycles of any length — 4-on-4-off, alternating weekends, night rotations — so your dashboard is accurate even when your weeks aren't identical.</p>
+          </details>
+          <details>
+            <summary>Can I stop sharing with someone?</summary>
+            <p>Anytime. Revoke a share and that person's app stops receiving your availability. Codes are one-time use, so nothing can be re-imported without your say-so.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- Closer -->
+    <section class="closer">
+      <div class="wrap reveal">
+        <p class="eyebrow" style="justify-content:center">Kairos &middot; the right moment</p>
+        <h2>Stop asking.<br />Start <em style="color:var(--accent);font-style:italic">knowing.</em></h2>
+        <p>Be the first to hear when Kairos is available — or just say hello. We read everything.</p>
+        <div class="cta" style="justify-content:center">
+          <a class="btn btn-primary" href="mailto:hello@kairosapp.dev">Get in touch</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="wrap footer-inner">
+      <div class="footer-brand">
+        <img src="icon.svg" alt="" />
+        <span>KAIROS</span>
+      </div>
+      <div class="footer-links">
+        <a href="#features">Features</a>
+        <a href="#privacy">Privacy</a>
+        <a href="mailto:hello@kairosapp.dev">hello@kairosapp.dev</a>
+      </div>
+      <span>&copy; 2026 Kairos LLC. All rights reserved.</span>
+    </div>
+  </footer>
+
+  <script>
+    // Scroll-reveal
+    (function () {
+      var els = document.querySelectorAll(".reveal");
+      if (!("IntersectionObserver" in window) ||
+          window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        els.forEach(function (el) { el.classList.add("visible"); });
+        return;
+      }
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.15, rootMargin: "0px 0px -40px 0px" });
+      els.forEach(function (el) { io.observe(el); });
+    })();
+
+    // Live clock in the mockup
+    (function () {
+      var el = document.getElementById("clock");
+      if (!el) return;
+      function tick() {
+        el.textContent = new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+      }
+      tick();
+      setInterval(tick, 30000);
+    })();
+  </script>
+</body>
+</html>
